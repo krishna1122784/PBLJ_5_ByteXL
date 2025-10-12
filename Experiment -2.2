@@ -1,0 +1,146 @@
+//Part A: Sum of Integers Using Autoboxing and Unboxing.
+import java.util.*;
+
+public class AutoboxingSum {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        List<Integer> numbers = new ArrayList<>();
+        System.out.println("Enter integers (type 'done' to finish):");
+
+        while (true) {
+            String input = sc.nextLine();
+            if (input.equalsIgnoreCase("done")) break;
+            try {
+                numbers.add(Integer.parseInt(input));
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input");
+            }
+        }
+
+        int sum = 0;
+        for (int num : numbers) {
+            sum += num;
+        }
+
+        System.out.println("Sum: " + sum);
+    }
+}
+
+//Part B: Serialization and Deserialization of a Student Object.
+import java.io.*;
+
+class Student implements Serializable {
+    int studentID;
+    String name;
+    double grade;
+
+    Student(int studentID, String name, double grade) {
+        this.studentID = studentID;
+        this.name = name;
+        this.grade = grade;
+    }
+
+    void display() {
+        System.out.println("ID: " + studentID);
+        System.out.println("Name: " + name);
+        System.out.println("Grade: " + grade);
+    }
+}
+
+public class StudentData {
+    public static void main(String[] args) {
+        Student s = new Student(101, "Krishna", 9.2);
+
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("student.dat"))) {
+            out.writeObject(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("student.dat"))) {
+            Student s2 = (Student) in.readObject();
+            s2.display();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+//Part C: Menu-Based Employee Management System Using File Handling.
+import java.io.*;
+import java.util.*;
+
+class Employee implements Serializable {
+    int id;
+    String name;
+    String designation;
+    double salary;
+
+    Employee(int id, String name, String designation, double salary) {
+        this.id = id;
+        this.name = name;
+        this.designation = designation;
+        this.salary = salary;
+    }
+
+    void display() {
+        System.out.println(id + " " + name + " " + designation + " " + salary);
+    }
+}
+
+public class EmployeeManager {
+    static final String FILE = "employees.dat";
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("1. Add Employee");
+            System.out.println("2. Display All Employees");
+            System.out.println("3. Exit");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1 -> add(sc);
+                case 2 -> show();
+                case 3 -> System.out.println("Exiting");
+                default -> System.out.println("Invalid");
+            }
+        } while (choice != 3);
+    }
+
+    static void add(Scanner sc) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE, true))) {
+            System.out.print("ID: ");
+            int id = sc.nextInt();
+            sc.nextLine();
+            System.out.print("Name: ");
+            String name = sc.nextLine();
+            System.out.print("Designation: ");
+            String desig = sc.nextLine();
+            System.out.print("Salary: ");
+            double sal = sc.nextDouble();
+
+            Employee e = new Employee(id, name, desig, sal);
+            out.writeObject(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void show() {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE))) {
+            while (true) {
+                Employee e = (Employee) in.readObject();
+                e.display();
+            }
+        } catch (EOFException e) {
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
